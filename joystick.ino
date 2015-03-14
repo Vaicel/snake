@@ -12,10 +12,12 @@
 #define SS_PIN 10
 #define COLS_NUM 8
 
-#define DRAW_TIME 500
+#define DRAW_TIME 100
+
+#define USE_SIMULATOR
 
 int headX=0;
-int headY=0;
+int headY=6;
 
 int dir = 1;
 // 0 - up
@@ -23,16 +25,7 @@ int dir = 1;
 // 2 - left
 // 3 - right
 
-boolean pic[8][8] = {
-	{0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0}
-};
+boolean pic[8][8] = {NULL};
 
 int timer = 0, timePrev = 0;
 
@@ -61,8 +54,13 @@ void draw(){
 		for(int bitInCol = 7; bitInCol>=0; bitInCol--)
 			col = pic[raw][bitInCol] << bitInCol;	
 		digitalWrite(SS_PIN,LOW);
-		SPI.transfer(0xFF ^ 1<<raw);
+#ifdef USE_SIMULATOR
 		SPI.transfer(col);
+		SPI.transfer(0xFF ^ (1<<raw));
+#else
+		SPI.transfer(0xFF ^ (1<<raw));
+		SPI.transfer(col);
+#endif
 		digitalWrite(SS_PIN,HIGH);
 		delay(1);
 	}
@@ -70,10 +68,10 @@ void draw(){
 
 void generateHead(int headX, int headY, int dir){
 	switch(dir){
-		case 0: 	headY += 1; break;
-		case 1: 	headY -= 1; break;
+		case 1: 	headY += 1; break;
+		case 0: 	headY -= 1; break;
 		case 2: 	headX -= 1; break;
-		case 3: headX += 1; break;
+		case 3: 	headX += 1; break;
 	}
 	pic[8][8]=NULL;
 	pic[headY][headX]=1;
