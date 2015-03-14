@@ -14,14 +14,8 @@
 
 #define DRAW_TIME 500
 
-stuct Point {
-	int x;
-	int y;
-}
-
-Point head;
-head.x=0;
-head.y=0;
+int headX=0;
+int headY=0;
 
 enum dir
 {
@@ -32,7 +26,7 @@ enum dir
 };
 
 
-boolean pic [8][8]{
+boolean pic[8][8]{
 	{0,0,0,0,0,0,0,0},
 	{0,0,0,0,0,0,0,0},
 	{0,0,0,0,0,0,0,0},
@@ -55,9 +49,10 @@ int p;
 
 void loop()
 {
+	enum dir = up;
 	timer=millis();
-	if(timer - timePrev == DRAW_TIME){
-		generateHead(head,up);
+	if((timer - timePrev) >= DRAW_TIME){
+		generateHead(headX, headY, dir);
 		timePrev=timer;
 	}
 	draw();
@@ -76,13 +71,13 @@ void draw(){
 	}
 }
 
-void generateHead(Point point, int dir){
+void generateHead(int headX, int headY, int dir){
 	switch(dir){
-		case up: 	point.y += 1; break;
-		case down: 	point.y -= 1; break;
-		case left: 	point.x -= 1; break;
-		case right: point.x += 1; break;
+		case up: 	headY += 1; break;
+		case down: 	headY -= 1; break;
+		case left: 	headX -= 1; break;
+		case right: headX += 1; break;
 	}
-	pic[][]={NULL};
-	pic[point.y][point.x]=1;
+	pic[8][8]={NULL};
+	pic[headY][headX]=1;
 }	
