@@ -1,3 +1,4 @@
+#include <SPI.h>
 #define X_AXE_PIN A0
 #define Y_AXE_PIN A1
 
@@ -7,25 +8,19 @@
 #define LEFT_THRESHOLD 200
 #define RIGHT_THRESHOLD 900
 
+#define SS_PIN 10
+#define COLS_NUM 8
+
+
 void setup()
 {
+	SPI.begin();
+  	pinMode(SS_PIN, OUTPUT);
 	pinMode(4, INPUT_PULLUP);
-	pinMode(5, OUTPUT);
-	pinMode(6, OUTPUT);
-	pinMode(7, OUTPUT);
-	pinMode(8, OUTPUT);
-	Serial.begin(9600);
 }
 int p;
+
 /*void loop()
-{
-	Serial.print("x = ");
-	Serial.print(analogRead(A0));
-	Serial.print("     y = ");
-	Serial.println(analogRead(A1));
-	delay(100);
-}*/
-void loop()
 {
 	if(analogRead(X_AXE_PIN)>RIGHT_THRESHOLD){
 		digitalWrite(p, LOW);
@@ -55,4 +50,11 @@ void loop()
 			p = 8;
 		}
 	}
-}	
+}*/
+void loop()
+	{
+		digitalWrite(SS_PIN,LOW);
+		SPI.transfer(0xFF^ 1<<map(analogRead(A1), 0, 1022, 0, 7));
+		SPI.transfer(1<<map(analogRead(A0), 0, 1021, 0, 7));	
+		digitalWrite(SS_PIN,HIGH);
+	}	
