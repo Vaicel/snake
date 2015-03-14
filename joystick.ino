@@ -17,14 +17,11 @@
 int headX=0;
 int headY=0;
 
-enum dir
-{
-	up,
-	down,
-	left,
-	right
-};
-
+int dir = 1;
+// 0 - up
+// 1 - down
+// 2 - left
+// 3 - right
 
 boolean pic[8][8]{
 	{0,0,0,0,0,0,0,0},
@@ -49,7 +46,7 @@ int p;
 
 void loop()
 {
-	enum dir = up;
+	dir = 1;
 	timer=millis();
 	if((timer - timePrev) >= DRAW_TIME){
 		generateHead(headX, headY, dir);
@@ -73,10 +70,10 @@ void draw(){
 
 void generateHead(int headX, int headY, int dir){
 	switch(dir){
-		case up: 	headY += 1; break;
-		case down: 	headY -= 1; break;
-		case left: 	headX -= 1; break;
-		case right: headX += 1; break;
+		case 0: 	headY += 1; break;
+		case 1: 	headY -= 1; break;
+		case 2: 	headX -= 1; break;
+		case 3: headX += 1; break;
 	}
 	pic[8][8]={NULL};
 	pic[headY][headX]=1;
