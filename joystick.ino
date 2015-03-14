@@ -11,11 +11,13 @@
 #define SS_PIN 10
 #define COLS_NUM 8
 
+#define DRAW_TIME 500
+
 boolean pic [8][8]{
 
 {0,0,0,0,0,0,0,0},
 {0,0,0,0,0,0,0,0},
-{0,1,0,0,1,0,0,0},
+{0,0,0,0,1,0,0,0},
 {0,0,0,0,0,0,0,0},
 {0,0,0,1,0,0,0,0},
 {0,0,0,0,0,0,0,0},
@@ -24,6 +26,8 @@ boolean pic [8][8]{
 };
 
 byte x;
+
+int timer = 0, timePrev = 0;
 
 void setup()
 {
@@ -34,17 +38,24 @@ void setup()
 int p;
 
 void loop()
-	{
-		for(int t = 0; t<8; t++){
-			digitalWrite(SS_PIN,LOW);
-			SPI.transfer(0xFF ^ 1<<t);
-			x=0;
-			for(int v = 7; v>=0; v--){
-				x = x+(pic[t][v] << v);	
-			}
-			SPI.transfer(x);
-			digitalWrite(SS_PIN,HIGH);
-			delay(1);
-		}
+{
+	timer=millis();
+	if(timer - timePrev == DRAW_TIME){
+		draw();
+		timePrev=timer;
+	}
+}
 
-	}	
+void draw(){
+	for(int t = 0; t<8; t++){
+		x=0;
+		for(int v = 7; v>=0; v--){
+			x = x+(pic[t][v] << v);	
+		}
+		digitalWrite(SS_PIN,LOW);
+		SPI.transfer(0xFF ^ 1<<t);
+		SPI.transfer(x);
+		digitalWrite(SS_PIN,HIGH);
+		delay(1);
+	}
+}	
