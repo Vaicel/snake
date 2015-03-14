@@ -1,4 +1,5 @@
 #include <SPI.h>
+
 #define X_AXE_PIN A0
 #define Y_AXE_PIN A1
 
@@ -13,19 +14,34 @@
 
 #define DRAW_TIME 500
 
-boolean pic [8][8]{
+stuct Point {
+	int x;
+	int y;
+}
 
-{0,0,0,0,0,0,0,0},
-{0,0,0,0,0,0,0,0},
-{0,0,0,0,1,0,0,0},
-{0,0,0,0,0,0,0,0},
-{0,0,0,1,0,0,0,0},
-{0,0,0,0,0,0,0,0},
-{0,0,0,0,0,1,0,0},
-{0,0,0,0,1,0,0,0}
+Point head;
+head.x=0;
+head.y=0;
+
+enum dir
+{
+	up,
+	down,
+	left,
+	right
 };
 
-byte x;
+
+boolean pic [8][8]{
+	{0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0}
+};
 
 int timer = 0, timePrev = 0;
 
@@ -41,21 +57,32 @@ void loop()
 {
 	timer=millis();
 	if(timer - timePrev == DRAW_TIME){
-		draw();
+		generateHead(head,up);
 		timePrev=timer;
 	}
+	draw();
 }
 
 void draw(){
-	for(int t = 0; t<8; t++){
-		x=0;
-		for(int v = 7; v>=0; v--){
-			x = x+(pic[t][v] << v);	
-		}
+	int col;
+	for(int raw = 0; raw < 8; raw++){
+		for(int bitInCol = 7; bitInCol>=0; bitInCol--)
+			col = pic[raw][bitInCol] << bitInCol;	
 		digitalWrite(SS_PIN,LOW);
-		SPI.transfer(0xFF ^ 1<<t);
-		SPI.transfer(x);
+		SPI.transfer(0xFF ^ 1<<raw);
+		SPI.transfer(col);
 		digitalWrite(SS_PIN,HIGH);
 		delay(1);
 	}
+}
+
+void generateHead(Point point, int dir){
+	switch(dir){
+		case up: 	point.y += 1; break;
+		case down: 	point.y -= 1; break;
+		case left: 	point.x -= 1; break;
+		case right: point.x += 1; break;
+	}
+	pic[][]={NULL};
+	pic[point.y][point.x]=1;
 }	
