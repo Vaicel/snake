@@ -26,7 +26,7 @@ enum dir
 };
 
 
-boolean pic[8][8]{
+boolean pic[8][8] = {
 	{0,0,0,0,0,0,0,0},
 	{0,0,0,0,0,0,0,0},
 	{0,0,0,0,0,0,0,0},
@@ -78,6 +78,6 @@ void generateHead(int headX, int headY, int dir){
 		case left: 	headX -= 1; break;
 		case right: headX += 1; break;
 	}
-	pic[8][8]={NULL};
+	pic[8][8]=NULL;
 	pic[headY][headX]=1;
 }	
