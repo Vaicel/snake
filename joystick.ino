@@ -14,8 +14,6 @@
 
 #define DRAW_TIME 100
 
-#define USE_SIMULATOR
-
 int headX=0;
 int headY=6;
 
@@ -54,13 +52,8 @@ void draw(){
 		for(int bitInCol = 7; bitInCol>=0; bitInCol--)
 			col = pic[raw][bitInCol] << bitInCol;	
 		digitalWrite(SS_PIN,LOW);
-#ifdef USE_SIMULATOR
-		SPI.transfer(col);
-		SPI.transfer(0xFF ^ (1<<raw));
-#else
 		SPI.transfer(0xFF ^ (1<<raw));
 		SPI.transfer(col);
-#endif
 		digitalWrite(SS_PIN,HIGH);
 		delay(1);
 	}
