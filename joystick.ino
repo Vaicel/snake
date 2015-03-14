@@ -23,7 +23,7 @@ int dir = 1;
 // 2 - left
 // 3 - right
 
-boolean pic[8][8]{
+boolean pic[8][8] = {
 	{0,0,0,0,0,0,0,0},
 	{0,0,0,0,0,0,0,0},
 	{0,0,0,0,0,0,0,0},
@@ -75,6 +75,6 @@ void generateHead(int headX, int headY, int dir){
 		case 2: 	headX -= 1; break;
 		case 3: headX += 1; break;
 	}
-	pic[8][8]={NULL};
+	pic[8][8]=NULL;
 	pic[headY][headX]=1;
 }	
