@@ -12,7 +12,7 @@
 #define SS_PIN 10
 #define COLS_NUM 8
 
-#define DRAW_TIME 100
+#define DRAW_TIME 2000
 
 //struct Point{
 //   int x;
@@ -28,15 +28,19 @@ int dir = 1;
 // 2 - left
 // 3 - right
 
-boolean pic[8][8] ;//= {NULL};
+boolean pic[8][8];//= {NULL};
 
 int timer = 0, timePrev = 0;
+
+Point head={0,0};
 
 void draw(){
 	int col;
 	for(int raw = 0; raw < 8; raw++){
-		for(int bitInCol = 7; bitInCol>=0; bitInCol--)
-			col = pic[raw][bitInCol] << bitInCol;	
+		col=0;
+		for(int bitInCol = 7; bitInCol>=0; bitInCol--){
+			col = col+(pic[raw][bitInCol] << bitInCol);	
+		}
 		digitalWrite(SS_PIN,LOW);
 		SPI.transfer(0xFF ^ (1<<raw));
 		SPI.transfer(col);
@@ -52,21 +56,23 @@ Point generateHead(Point head, int dir){
 		case 2: 	head.x -= 1; break;
 		case 3: 	head.x += 1; break;
 	}
-	pic[8][8]=NULL;
+	for(int x1 = 0; x1<8; x1++){
+		for(int y1 = 0; y1<8; y1++){	
+			pic[x1][y1]=0;
+		}
+	}
 	pic[head.y][head.x]=1;
 	return head;
 }	
+	byte col = 0;
 
-void setup()
-{
+void setup(){
 	SPI.begin();
   	pinMode(SS_PIN, OUTPUT);
 	pinMode(4, INPUT_PULLUP);
 }
 
-void loop()
-{
-	Point head={1,1};
+void loop(){
 	dir = 1;
 	timer=millis();
 	if((timer - timePrev) >= DRAW_TIME){
