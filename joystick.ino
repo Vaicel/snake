@@ -12,7 +12,7 @@
 #define SS_PIN 10
 #define COLS_NUM 8
 
-#define DRAW_TIME 2000
+#define DRAW_TIME 200
 
 //struct Point{
 //   int x;
@@ -66,6 +66,8 @@ Point generateHead(Point head, int dir){
 }	
 	byte col = 0;
 
+int lastanalog;
+
 void setup(){
 	SPI.begin();
   	pinMode(SS_PIN, OUTPUT);
@@ -73,7 +75,18 @@ void setup(){
 }
 
 void loop(){
-	dir = 1;
+	if(analogRead(X_AXE_PIN)>RIGHT_THRESHOLD){
+		dir=2;
+	}
+	if(analogRead(Y_AXE_PIN)>UP_THRESHOLD){
+		dir=0;
+	}
+	if(analogRead(X_AXE_PIN)<LEFT_THRESHOLD){
+		dir=3;
+	}
+	if(analogRead(Y_AXE_PIN)<DOWN_THRESHOLD){
+		dir=1;
+	}
 	timer=millis();
 	if((timer - timePrev) >= DRAW_TIME){
 		head = generateHead(head, dir);
