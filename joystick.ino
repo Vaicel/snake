@@ -62,11 +62,30 @@ Point generateHead(Point head, int dir){
 		}
 	}
 	pic[head.y][head.x]=1;
+//	if(head.y > 7) head.y = -1;
+//	if(head.y < 0) head.y = 8;
 	return head;
 }	
 	byte col = 0;
 
 int lastanalog;
+
+int getDir(int dir){
+
+	if(analogRead(X_AXE_PIN)>RIGHT_THRESHOLD){
+		return 2;
+	}
+	if(analogRead(Y_AXE_PIN)>UP_THRESHOLD){
+		return 0;
+	}
+	if(analogRead(X_AXE_PIN)<LEFT_THRESHOLD){
+		return 3;
+	}
+	if(analogRead(Y_AXE_PIN)<DOWN_THRESHOLD){
+		return 1;
+	}
+	return dir;
+}
 
 void setup(){
 	SPI.begin();
@@ -75,21 +94,10 @@ void setup(){
 }
 
 void loop(){
-	if(analogRead(X_AXE_PIN)>RIGHT_THRESHOLD){
-		dir=2;
-	}
-	if(analogRead(Y_AXE_PIN)>UP_THRESHOLD){
-		dir=0;
-	}
-	if(analogRead(X_AXE_PIN)<LEFT_THRESHOLD){
-		dir=3;
-	}
-	if(analogRead(Y_AXE_PIN)<DOWN_THRESHOLD){
-		dir=1;
-	}
+
 	timer=millis();
 	if((timer - timePrev) >= DRAW_TIME){
-		head = generateHead(head, dir);
+		head = generateHead(head, dir = getDir(dir));
 		timePrev=timer;
 	}
 	draw();
