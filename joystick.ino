@@ -21,7 +21,7 @@ Snake body[62] = {NULL};
 //body[0].y = 1;
 //body[0].dir = 1;
 
-void draw(){
+void draw(boolean pic[8][8]){
 	byte col;
 	for(int raw = 0; raw < 8; raw++){
 		col=0;
@@ -92,9 +92,9 @@ void setup(){
 void loop(){
 	timer = millis();
 	if((timer - timerPrev) >= STEP_TIME){
-		head = generateHead(head);
 		body[62] = generateBody(body);
+		head = generateHead(head);
 		timerPrev = timer;
 	}
-	draw();
+	draw(pic);
 }
