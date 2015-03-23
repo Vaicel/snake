@@ -9,8 +9,17 @@ boolean pic[8][8];
 
 int timer = 0, timerPrev = 0;
 
-Snake head = {0,0,1};
+int snakeLength=3;
+
+Snake head = {0,2,1};
 Snake body[62] = {NULL};
+
+//body[0]={0,1,1};
+//body[1]={0,0,1};
+
+//body[0].x = 0;
+//body[0].y = 1;
+//body[0].dir = 1;
 
 void draw(){
 	byte col;
@@ -37,6 +46,16 @@ Snake generateHead(Snake head){
 	}
 	pic[head.y][head.x] = 1;
 	return head;
+}
+
+Snake generateBody(Snake body[62]){
+	for(int gbi = snakeLength-2; gbi >= 1; gbi--){
+		body[gbi]=body[gbi-1];
+		pic[body[gbi].y][body[gbi].x] = 1;
+	}
+	body[0] = head;
+	pic[body[0].y][body[0].x] = 1;
+	return body[62];
 }
 
 void clearMatrix(){
@@ -74,6 +93,7 @@ void loop(){
 	timer = millis();
 	if((timer - timerPrev) >= STEP_TIME){
 		head = generateHead(head);
+		body[62] = generateBody(body);
 		timerPrev = timer;
 	}
 	draw();
