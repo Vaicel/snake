@@ -10,7 +10,7 @@ boolean pic[8][8];
 int timer = 0, timerPrev = 0;
 
 int snakeLength=3;
-int lastdir = 5;
+int lastdir = 1;
 
 Snake head = {0,2,1};
 Snake body[62] = {NULL};
@@ -40,22 +40,18 @@ void draw(boolean pic[8][8]){
 Snake generateHead(Snake head){
 	head.dir = getDir(head.dir);
 	switch(head.dir){
-		case 1: 	if(lastdir !=0){
-					head.y += 1;}
-					else{head.y -=1;} break;
-		case 0: 	if(lastdir !=1){
-					head.y -= 1;}
-					else{head.y +=1;} break;
-		case 2: 	if(lastdir !=3){
-					head.x -= 1;}
-					else{head.x +=1;} break;
-		case 3: 	if(lastdir !=2){
-					head.x += 1;}
-					else{head.x -=1;} break;
+		case 1: 	
+		lastdir !=0 ? head.y += 1 : head.y -=1; break;
+		case 0:
+		lastdir !=1 ? head.y -= 1 : head.y +=1; break;
+		case 2:
+		lastdir !=3 ? head.x -= 1 : head.x +=1; break;
+		case 3: 
+		lastdir !=2 ? head.x += 1 : head.x -=1; break;
 	}
+	lastdir = head.dir;
 	pic[head.y][head.x] = 1;
 	return head;
-	lastdir = head.dir;
 }
 
 Snake generateBody(Snake body[62]){
@@ -94,6 +90,7 @@ int getDir(int dir){
 }
 
 void setup(){
+//	Serial.begin(115200);
 	randomSeed(analogRead(A5));
 	SPI.begin();
   	pinMode(SS_PIN, OUTPUT);
@@ -108,4 +105,5 @@ void loop(){
 		timerPrev = timer;
 	}
 	draw(pic);
+//	Serial.print(lastdir);
 }
