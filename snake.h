@@ -13,6 +13,13 @@
 #define SS_PIN 10
 #define COLS_NUM 8
 
+enum Dirs {
+	up,
+	down,
+	left,
+	right
+};
+
 struct Point{
 	int x;
 	int y;
@@ -21,7 +28,9 @@ struct Point{
 struct Snake{
 	int x;
 	int y;
-	int dir;
+	Dirs dir;
 };
+
+
 
 #endif

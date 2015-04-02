@@ -3,7 +3,12 @@
 
 #define STEP_TIME 200
 
-/*dir: 0 - up 1 - down 2 - left 3 - right*/
+/** Dirs: 
+* 	0 - up 
+*	1 - down 
+*	2 - left 
+*	3 - right
+**/
 
 boolean pic[8][8];
 
@@ -12,7 +17,7 @@ int timer = 0, timerPrev = 0;
 int snakeLength=3;
 int lastDir = 1;
 
-Snake head = {0,2,1};
+Snake head = {0,2,down};
 Snake body[62] = {NULL};
 
 //body[0]={0,1,1};
@@ -40,16 +45,16 @@ void draw(boolean pic[8][8]){
 Snake generateHead(Snake head){
 	head.dir = getDir(head.dir);
 	switch(head.dir){
-		case 1: 	
+		case down: 	
 //		lastdir !=0 ? head.y += 1 : head.y -=1; break;
 		head.y += 1; break;
-		case 0:
+		case up:
 //		lastdir !=1 ? head.y -= 1 : head.y +=1; break;
 		head.y -= 1; break;
-		case 2:
+		case left:
 //		lastdir !=3 ? head.x -= 1 : head.x +=1; break;
 		head.x -=1; break;
-		case 3: 
+		case right: 
 //		lastdir !=2 ? head.x += 1 : head.x -=1; break;
 		head.x +=1; break;
 	}
@@ -85,11 +90,11 @@ void generateFood(){
 	else generateFood();
 }
 
-int getDir(int dir){
-	if(analogRead(X_AXE_PIN)>RIGHT_THRESHOLD && lastDir != 3)	return 2;
-	if(analogRead(X_AXE_PIN)<LEFT_THRESHOLD && lastDir != 2)	return 3;
-	if(analogRead(Y_AXE_PIN)>UP_THRESHOLD && lastDir != 1)		return 0;
-	if(analogRead(Y_AXE_PIN)<DOWN_THRESHOLD && lastDir != 0)	return 1;
+Dirs getDir(Dirs dir){
+	if(analogRead(X_AXE_PIN)>RIGHT_THRESHOLD && lastDir != right)	return left;
+	if(analogRead(X_AXE_PIN)<LEFT_THRESHOLD && lastDir != left)	return right;
+	if(analogRead(Y_AXE_PIN)>UP_THRESHOLD && lastDir != down)		return up;
+	if(analogRead(Y_AXE_PIN)<DOWN_THRESHOLD && lastDir != up)	return down;
 	return dir;
 }
 
