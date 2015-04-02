@@ -2,6 +2,7 @@
 #include "snake.h"
 
 #define STEP_TIME 200
+#define MATRIX_REFRESH_TIME_MS 1
 
 /** Dirs: 
 * 	0 - up 
@@ -38,25 +39,21 @@ void draw(boolean pic[8][8]){
 		SPI.transfer(0xFF ^ (1<<raw));
 		SPI.transfer(col);
 		digitalWrite(SS_PIN,HIGH);
-		delay(1);
+		delay(MATRIX_REFRESH_TIME_MS);
 	}
 }
 
 Snake generateHead(Snake head){
 	head.dir = getDir(head.dir);
 	switch(head.dir){
-		case down: 	
+		case down:		head.y += 1; break;
 //		lastdir !=0 ? head.y += 1 : head.y -=1; break;
-		head.y += 1; break;
-		case up:
+		case up:		head.y -= 1; break;
 //		lastdir !=1 ? head.y -= 1 : head.y +=1; break;
-		head.y -= 1; break;
-		case left:
+		case left:		head.x -=1; break;
 //		lastdir !=3 ? head.x -= 1 : head.x +=1; break;
-		head.x -=1; break;
-		case right: 
+		case right:		head.x +=1; break;
 //		lastdir !=2 ? head.x += 1 : head.x -=1; break;
-		head.x +=1; break;
 	}
 	lastDir = head.dir;
 	pic[head.y][head.x] = 1;
@@ -64,7 +61,9 @@ Snake generateHead(Snake head){
 }
 
 Snake generateBody(Snake body[62]){
-	clearMatrix();
+	clearMatrix(); 										//почему именно здесь?
+	// думаю, что очищать всю матрицу, а затем рисовать всё снова - 
+	// не самая лучшая идея. Давай стирать только хвост и все.
 	for(int gbi = snakeLength-2; gbi >= 1; gbi--){
 		body[gbi]=body[gbi-1];
 		pic[body[gbi].y][body[gbi].x] = 1;
@@ -92,9 +91,9 @@ void generateFood(){
 
 Dirs getDir(Dirs dir){
 	if(analogRead(X_AXE_PIN)>RIGHT_THRESHOLD && lastDir != right)	return left;
-	if(analogRead(X_AXE_PIN)<LEFT_THRESHOLD && lastDir != left)	return right;
+	if(analogRead(X_AXE_PIN)<LEFT_THRESHOLD && lastDir != left)		return right;
 	if(analogRead(Y_AXE_PIN)>UP_THRESHOLD && lastDir != down)		return up;
-	if(analogRead(Y_AXE_PIN)<DOWN_THRESHOLD && lastDir != up)	return down;
+	if(analogRead(Y_AXE_PIN)<DOWN_THRESHOLD && lastDir != up)		return down;
 	return dir;
 }
 

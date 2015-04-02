@@ -31,6 +31,4 @@ struct Snake{
 	Dirs dir;
 };
 
-
-
 #endif
