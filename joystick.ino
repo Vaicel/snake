@@ -15,7 +15,7 @@ boolean pic[8][8];
 
 int timer = 0, timerPrev = 0;
 
-int snakeLength=7;
+int snakeLength=3;
 int lastDir = 1;
 int coount = 0;
 Point food;
@@ -50,13 +50,9 @@ Snake generateHead(Snake head){
 	head.dir = getDir(head.dir);
 	switch(head.dir){
 		case down:		head.y += 1; break;
-//		lastdir !=0 ? head.y += 1 : head.y -=1; break;
 		case up:		head.y -= 1; break;
-//		lastdir !=1 ? head.y -= 1 : head.y +=1; break;
 		case left:		head.x -=1; break;
-//		lastdir !=3 ? head.x -= 1 : head.x +=1; break;
 		case right:		head.x +=1; break;
-//		lastdir !=2 ? head.x += 1 : head.x -=1; break;
 	}
 	lastDir = head.dir;
 	if(head.x>7){
@@ -107,11 +103,10 @@ void clearMatrix(){
 }
 
 void generateFood(){
-food = {random(8),random(8)};
-	if (pic[food.x][food.y] == 0){
-		pic[food.x][food.y] = 1; 
+	food = {random(8),random(8)};
+	if (pic[food.x][food.y] != 0){
+		generateFood();
 	}
-	else generateFood();
 }
 
 Dirs getDir(Dirs dir){
@@ -128,20 +123,21 @@ void setup(){
 	SPI.begin();
   	pinMode(SS_PIN, OUTPUT);
 	pinMode(Z_AXE_PIN, INPUT_PULLUP);
+	generateFood();
+	Serial.begin(9600);
 }
 void loop(){
 	timer = millis();
 	if((timer - timerPrev) >= STEP_TIME){
 		body[62] = generateBody(body);
+		if(head.x == food.x && head.y == food.y){
+			snakeLength++;
+			generateFood();
+		}
 		head = generateHead(head);
 		timerPrev = timer;
-		coount++;
+		pic[food.y][food.x] = 1;
 	}
+	Serial.println(snakeLength);
 	draw(pic);
-/*	if(coount == 10){
-		snakeLength++;
-		coount = 0;
-	} */
-
-//	Serial.print(lastDir);
 }
