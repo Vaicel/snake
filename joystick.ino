@@ -7,7 +7,7 @@
 /** Dirs: 
 * 	0 - up 
 *	1 - down 
-*	2 - left 
+*	2 - left 	
 *	3 - right
 **/
 
@@ -56,6 +56,22 @@ Snake generateHead(Snake head){
 //		lastdir !=2 ? head.x += 1 : head.x -=1; break;
 	}
 	lastDir = head.dir;
+	if(head.x>7){
+		head.x = 0;
+	}
+	else{ 
+		if(head.x<0){
+			head.x = 7;
+		}
+	}
+	if(head.y>7){
+		head.y = 0;
+	}
+	else{ 
+		if(head.y<0){
+			head.y = 7;
+		}
+	}
 	pic[head.y][head.x] = 1;
 	return head;
 }
@@ -102,9 +118,9 @@ void setup(){
 	randomSeed(analogRead(A5));
 	SPI.begin();
   	pinMode(SS_PIN, OUTPUT);
+
 	pinMode(Z_AXE_PIN, INPUT_PULLUP);
 }
-
 void loop(){
 	timer = millis();
 	if((timer - timerPrev) >= STEP_TIME){
