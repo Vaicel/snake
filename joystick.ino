@@ -1,7 +1,7 @@
 #include <SPI.h>
 #include "snake.h"
 
-#define STEP_TIME 200
+#define STEP_TIME 130
 #define MATRIX_REFRESH_TIME_MS 1
 
 /** Dirs: 
@@ -15,8 +15,10 @@ boolean pic[8][8];
 
 int timer = 0, timerPrev = 0;
 
-int snakeLength=3;
+int snakeLength=7;
 int lastDir = 1;
+int coount = 0;
+Point food;
 
 Snake head = {0,2,down};
 Snake body[62] = {NULL};
@@ -42,6 +44,7 @@ void draw(boolean pic[8][8]){
 		delay(MATRIX_REFRESH_TIME_MS);
 	}
 }
+
 
 Snake generateHead(Snake head){
 	head.dir = getDir(head.dir);
@@ -72,8 +75,14 @@ Snake generateHead(Snake head){
 			head.y = 7;
 		}
 	}
+	if(pic[head.y][head.x] == 1 && head.x != food.x && head.y != food.y){
+		TheDeath();
+	}
 	pic[head.y][head.x] = 1;
 	return head;
+}
+void TheDeath(){
+	asm volatile("jmp 0x00");
 }
 
 Snake generateBody(Snake body[62]){
@@ -98,7 +107,7 @@ void clearMatrix(){
 }
 
 void generateFood(){
-	Point food = {random(8),random(8)};
+food = {random(8),random(8)};
 	if (pic[food.x][food.y] == 0){
 		pic[food.x][food.y] = 1; 
 	}
@@ -118,7 +127,6 @@ void setup(){
 	randomSeed(analogRead(A5));
 	SPI.begin();
   	pinMode(SS_PIN, OUTPUT);
-
 	pinMode(Z_AXE_PIN, INPUT_PULLUP);
 }
 void loop(){
@@ -127,7 +135,13 @@ void loop(){
 		body[62] = generateBody(body);
 		head = generateHead(head);
 		timerPrev = timer;
+		coount++;
 	}
 	draw(pic);
+/*	if(coount == 10){
+		snakeLength++;
+		coount = 0;
+	} */
+
 //	Serial.print(lastDir);
 }
