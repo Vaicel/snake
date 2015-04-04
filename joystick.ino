@@ -1,17 +1,28 @@
+//Beta v 1.0
+
 #include <SPI.h>
 #include "snake.h"
 
 #define STEP_TIME 200
+#define MATRIX_REFRESH_TIME_MS 1
 
-/*dir: 0 - up 1 - down 2 - left 3 - right*/
+/** Dirs: 
+* 	0 - up 
+*	1 - down 
+*	2 - left 	
+*	3 - right
+**/
 
 boolean pic[8][8];
 
 int timer = 0, timerPrev = 0;
 
 int snakeLength=3;
+int lastDir = 1;
+int coount = 0;
+Point food;
 
-Snake head = {0,2,1};
+Snake head = {0,2,down};
 Snake body[62] = {NULL};
 
 //body[0]={0,1,1};
@@ -32,23 +43,50 @@ void draw(boolean pic[8][8]){
 		SPI.transfer(0xFF ^ (1<<raw));
 		SPI.transfer(col);
 		digitalWrite(SS_PIN,HIGH);
-		delay(1);
+		delay(MATRIX_REFRESH_TIME_MS);
 	}
 }
+
 
 Snake generateHead(Snake head){
 	head.dir = getDir(head.dir);
 	switch(head.dir){
-		case 1: 	head.y += 1; break;
-		case 0: 	head.y -= 1; break;
-		case 2: 	head.x -= 1; break;
-		case 3: 	head.x += 1; break;
+		case down:		head.y += 1; break;
+		case up:		head.y -= 1; break;
+		case left:		head.x -=1; break;
+		case right:		head.x +=1; break;
+	}
+	lastDir = head.dir;
+	if(head.x>7){
+		head.x = 0;
+	}
+	else{ 
+		if(head.x<0){
+			head.x = 7;
+		}
+	}
+	if(head.y>7){
+		head.y = 0;
+	}
+	else{ 
+		if(head.y<0){
+			head.y = 7;
+		}
+	}
+	if(pic[head.y][head.x] == 1 && head.x != food.x && head.y != food.y){
+		TheDeath();
 	}
 	pic[head.y][head.x] = 1;
 	return head;
 }
+void TheDeath(){
+	asm volatile("jmp 0x00");
+}
 
 Snake generateBody(Snake body[62]){
+	clearMatrix(); 										//почему именно здесь?
+	// думаю, что очищать всю матрицу, а затем рисовать всё снова - 
+	// не самая лучшая идея. Давай стирать только хвост и все.
 	for(int gbi = snakeLength-2; gbi >= 1; gbi--){
 		body[gbi]=body[gbi-1];
 		pic[body[gbi].y][body[gbi].x] = 1;
@@ -67,18 +105,17 @@ void clearMatrix(){
 }
 
 void generateFood(){
-	Point food = {random(8),random(8)};
-	if (pic[food.x][food.y] == 0){
-		pic[food.x][food.y] = 1; 
+	food = {random(8),random(8)};
+	if (pic[food.x][food.y] != 0){
+		generateFood();
 	}
-	else generateFood();
 }
 
-int getDir(int dir){
-	if(analogRead(X_AXE_PIN)>RIGHT_THRESHOLD)	return 2;
-	if(analogRead(Y_AXE_PIN)>UP_THRESHOLD)		return 0;
-	if(analogRead(X_AXE_PIN)<LEFT_THRESHOLD)	return 3;
-	if(analogRead(Y_AXE_PIN)<DOWN_THRESHOLD)	return 1;
+Dirs getDir(Dirs dir){
+	if(analogRead(X_AXE_PIN)>RIGHT_THRESHOLD && lastDir != right)	return left;
+	if(analogRead(X_AXE_PIN)<LEFT_THRESHOLD && lastDir != left)		return right;
+	if(analogRead(Y_AXE_PIN)>UP_THRESHOLD && lastDir != down)		return up;
+	if(analogRead(Y_AXE_PIN)<DOWN_THRESHOLD && lastDir != up)		return down;
 	return dir;
 }
 
@@ -87,14 +124,19 @@ void setup(){
 	SPI.begin();
   	pinMode(SS_PIN, OUTPUT);
 	pinMode(Z_AXE_PIN, INPUT_PULLUP);
+	generateFood();
 }
-
 void loop(){
 	timer = millis();
 	if((timer - timerPrev) >= STEP_TIME){
 		body[62] = generateBody(body);
+		if(head.x == food.x && head.y == food.y){
+			snakeLength++;
+			generateFood();
+		}
 		head = generateHead(head);
 		timerPrev = timer;
+		pic[food.y][food.x] = 1;
 	}
 	draw(pic);
 }
