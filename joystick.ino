@@ -1,7 +1,9 @@
+//Beta v 1.0
+
 #include <SPI.h>
 #include "snake.h"
 
-#define STEP_TIME 130
+#define STEP_TIME 200
 #define MATRIX_REFRESH_TIME_MS 1
 
 /** Dirs: 
@@ -118,13 +120,11 @@ Dirs getDir(Dirs dir){
 }
 
 void setup(){
-//	Serial.begin(115200);
 	randomSeed(analogRead(A5));
 	SPI.begin();
   	pinMode(SS_PIN, OUTPUT);
 	pinMode(Z_AXE_PIN, INPUT_PULLUP);
 	generateFood();
-	Serial.begin(9600);
 }
 void loop(){
 	timer = millis();
@@ -138,6 +138,5 @@ void loop(){
 		timerPrev = timer;
 		pic[food.y][food.x] = 1;
 	}
-	Serial.println(snakeLength);
 	draw(pic);
 }
