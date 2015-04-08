@@ -1,9 +1,11 @@
 //Beta v 1.0
-
 #include <SPI.h>
 #include "snake.h"
 
-#define STEP_TIME 200
+#define RAWSNUM 8
+#define COLSNUM 8
+
+#define STEP_TIME 100
 #define MATRIX_REFRESH_TIME_MS 1
 
 /** Dirs: 
@@ -12,8 +14,18 @@
 *	2 - left 	
 *	3 - right
 **/
+byte end [8] = { 
+0b00000000,
+0b11101111,
+0b10101101,
+0b11111101,
+0b10101101,
+0b11101111,
+0b00000000,
+0b00000000,
+};
 
-boolean pic[8][8];
+boolean pic[COLSNUM][RAWSNUM];
 
 int timer = 0, timerPrev = 0;
 
@@ -23,13 +35,13 @@ int coount = 0;
 Point food;
 
 Snake head = {0,2,down};
-Snake body[62] = {NULL};
+Snake body[(COLSNUM*RAWSNUM)-2] = {NULL};
 
-void draw(boolean pic[8][8]){
+void draw(boolean pic[COLSNUM][RAWSNUM]){
 	byte col;
-	for(int raw = 0; raw < 8; raw++){
+	for(int raw = 0; raw < RAWSNUM; raw++){
 		col=0;
-		for(int bitInCol = 7; bitInCol >= 0; bitInCol--){
+		for(int bitInCol = COLSNUM-1; bitInCol >= 0; bitInCol--){
 			col = col + (pic[raw][bitInCol] << bitInCol);	
 		}
 		digitalWrite(SS_PIN,LOW);
@@ -50,20 +62,20 @@ Snake generateHead(Snake head){
 		case right:		head.x +=1; break;
 	}
 	lastDir = head.dir;
-	if(head.x>7){
+	if(head.x>(COLSNUM-1)){
 		head.x = 0;
 	}
 	else{ 
 		if(head.x<0){
-			head.x = 7;
+			head.x = COLSNUM-1;
 		}
 	}
-	if(head.y>7){
+	if(head.y>(RAWSNUM-1)){
 		head.y = 0;
 	}
 	else{ 
 		if(head.y<0){
-			head.y = 7;
+			head.y = RAWSNUM-1;
 		}
 	}
 	if(pic[head.y][head.x] == 1 && head.x != food.x && head.y != food.y){
@@ -73,10 +85,16 @@ Snake generateHead(Snake head){
 	return head;
 }
 void TheDeath(){
+	for(int x1 = 0; x1 < COLSNUM; x1++){
+		for(int y1 = 0; y1 < RAWSNUM; y1++){	
+			pic[x1][y1]=0;
+		}
+	}
+	delay(2000);
 	asm volatile("jmp 0x00");
 }
 
-Snake generateBody(Snake body[62]){
+Snake generateBody(Snake body[(COLSNUM*RAWSNUM)-2]){
 	clearMatrix(); 										//почему именно здесь?
 	// думаю, что очищать всю матрицу, а затем рисовать всё снова - 
 	// не самая лучшая идея. Давай стирать только хвост и все.
@@ -90,15 +108,17 @@ Snake generateBody(Snake body[62]){
 }
 
 void clearMatrix(){
-	for(int x1 = 0; x1 < 8; x1++){
-		for(int y1 = 0; y1 < 8; y1++){	
+	for(int x1 = 0; x1 < COLSNUM; x1++){
+		for(int y1 = 0; y1 < RAWSNUM; y1++){	
 			pic[x1][y1]=0;
 		}
 	}
 }
 
 void generateFood(){
-	food = {random(8),random(8)};
+//	food = {random(8),random(8)};
+	food.x = random(COLSNUM);
+	food.y = random(RAWSNUM);
 	if (pic[food.x][food.y] != 0){
 		generateFood();
 	}
@@ -122,7 +142,7 @@ void setup(){
 void loop(){
 	timer = millis();
 	if((timer - timerPrev) >= STEP_TIME){
-		body[62] = generateBody(body);
+		body[(COLSNUM*RAWSNUM)-2] = generateBody(body);
 		if(head.x == food.x && head.y == food.y){
 			snakeLength++;
 			generateFood();
