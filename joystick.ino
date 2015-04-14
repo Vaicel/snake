@@ -1,11 +1,9 @@
 //Beta v 1.0
+
 #include <SPI.h>
 #include "snake.h"
 
-#define RAWSNUM 8
-#define COLSNUM 8
-
-#define STEP_TIME 100
+#define STEP_TIME 200 
 #define MATRIX_REFRESH_TIME_MS 1
 
 /** Dirs: 
@@ -14,18 +12,8 @@
 *	2 - left 	
 *	3 - right
 **/
-byte end [8] = { 
-0b00000000,
-0b11101111,
-0b10101101,
-0b11111101,
-0b10101101,
-0b11101111,
-0b00000000,
-0b00000000,
-};
 
-boolean pic[COLSNUM][RAWSNUM];
+boolean pic[8][8];
 
 int timer = 0, timerPrev = 0;
 
@@ -33,15 +21,24 @@ int snakeLength=3;
 int lastDir = 1;
 int coount = 0;
 Point food;
+int i = 3;
+int t =1;
 
 Snake head = {0,2,down};
-Snake body[(COLSNUM*RAWSNUM)-2] = {NULL};
+Snake body[62] = {NULL};
 
-void draw(boolean pic[COLSNUM][RAWSNUM]){
+//body[0]={0,1,1};
+//body[1]={0,0,1};
+
+//body[0].x = 0;
+//body[0].y = 1;
+//body[0].dir = 1;
+
+void draw(boolean pic[8][8]){
 	byte col;
-	for(int raw = 0; raw < RAWSNUM; raw++){
+	for(int raw = 0; raw < 8; raw++){
 		col=0;
-		for(int bitInCol = COLSNUM-1; bitInCol >= 0; bitInCol--){
+		for(int bitInCol = 7; bitInCol >= 0; bitInCol--){
 			col = col + (pic[raw][bitInCol] << bitInCol);	
 		}
 		digitalWrite(SS_PIN,LOW);
@@ -61,21 +58,21 @@ Snake generateHead(Snake head){
 		case left:		head.x -=1; break;
 		case right:		head.x +=1; break;
 	}
-	lastDir = head.dir;
-	if(head.x>(COLSNUM-1)){
+	lastDir=head.dir;
+	if(head.x>7){
 		head.x = 0;
 	}
 	else{ 
 		if(head.x<0){
-			head.x = COLSNUM-1;
+			head.x = 7;
 		}
 	}
-	if(head.y>(RAWSNUM-1)){
+	if(head.y>7){
 		head.y = 0;
 	}
 	else{ 
 		if(head.y<0){
-			head.y = RAWSNUM-1;
+			head.y = 7;
 		}
 	}
 	if(pic[head.y][head.x] == 1 && head.x != food.x && head.y != food.y){
@@ -85,19 +82,11 @@ Snake generateHead(Snake head){
 	return head;
 }
 void TheDeath(){
-	for(int x1 = 0; x1 < COLSNUM; x1++){
-		for(int y1 = 0; y1 < RAWSNUM; y1++){	
-			pic[x1][y1]=0;
-		}
-	}
-	delay(2000);
 	asm volatile("jmp 0x00");
 }
 
-Snake generateBody(Snake body[(COLSNUM*RAWSNUM)-2]){
-	clearMatrix(); 										//почему именно здесь?
-	// думаю, что очищать всю матрицу, а затем рисовать всё снова - 
-	// не самая лучшая идея. Давай стирать только хвост и все.
+Snake generateBody(Snake body[62]){
+
 	for(int gbi = snakeLength-2; gbi >= 1; gbi--){
 		body[gbi]=body[gbi-1];
 		pic[body[gbi].y][body[gbi].x] = 1;
@@ -108,19 +97,40 @@ Snake generateBody(Snake body[(COLSNUM*RAWSNUM)-2]){
 }
 
 void clearMatrix(){
-	for(int x1 = 0; x1 < COLSNUM; x1++){
-		for(int y1 = 0; y1 < RAWSNUM; y1++){	
+	for(int x1 = 0; x1 < 8; x1++){
+		for(int y1 = 0; y1 < 8; y1++){	
 			pic[x1][y1]=0;
 		}
 	}
 }
 
 void generateFood(){
-//	food = {random(8),random(8)};
-	food.x = random(COLSNUM);
-	food.y = random(RAWSNUM);
+	food.x= random(8);
+	food.y= random(8);
 	if (pic[food.x][food.y] != 0){
 		generateFood();
+	}
+}
+
+void playMusic() {
+	if(t%2 == 0){	
+		noTone(5);
+		tone(5, i*100, 300);
+		i++;
+	}
+	else{
+		noTone(5);
+		tone(5, i*200, 300);
+		i++;
+	}
+	if(i>6){
+		i=3;
+		t++;
+	}
+	
+	if(t>24){
+		noTone(5);
+		t=1;
 	}
 }
 
@@ -136,20 +146,30 @@ void setup(){
 	randomSeed(analogRead(A5));
 	SPI.begin();
   	pinMode(SS_PIN, OUTPUT);
+  	pinMode(5, OUTPUT);
 	pinMode(Z_AXE_PIN, INPUT_PULLUP);
 	generateFood();
 }
 void loop(){
 	timer = millis();
 	if((timer - timerPrev) >= STEP_TIME){
-		body[(COLSNUM*RAWSNUM)-2] = generateBody(body);
+		clearMatrix();
+		body[62] = generateBody(body);
+		head = generateHead(head);
 		if(head.x == food.x && head.y == food.y){
 			snakeLength++;
 			generateFood();
 		}
-		head = generateHead(head);
-		timerPrev = timer;
 		pic[food.y][food.x] = 1;
+		playMusic();
+		timerPrev = timer;
 	}
 	draw(pic);
+	if(digitalRead(Z_AXE_PIN)!=0){
+		delay(150);
+		while(digitalRead(Z_AXE_PIN)==0){
+			draw(pic);
+		}
+		delay(150);
+	}
 }
