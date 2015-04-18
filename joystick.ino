@@ -12,6 +12,7 @@
 *	2 - left 	
 *	3 - right
 **/
+int blinkTime = 0;
 
 boolean pic[8][8];
 
@@ -22,10 +23,21 @@ int lastDir = 1;
 int coount = 0;
 Point food;
 int i = 3;
-int t =1;
+int t = 1;
 
 Snake head = {0,2,down};
 Snake body[62] = {NULL};
+
+boolean death[8][8]{
+{1,1,0,0,0,0,1,1},
+{1,0,1,0,0,1,0,1},
+{1,1,0,1,1,0,1,1},
+{1,0,1,0,0,1,0,1},
+{1,0,0,0,0,0,0,1},
+{1,0,1,1,1,1,0,1},
+{1,1,0,0,0,0,1,1},
+{1,1,0,0,0,0,1,1}
+};
 
 //body[0]={0,1,1};
 //body[1]={0,0,1};
@@ -39,7 +51,7 @@ void draw(boolean pic[8][8]){
 	for(int raw = 0; raw < 8; raw++){
 		col=0;
 		for(int bitInCol = 7; bitInCol >= 0; bitInCol--){
-			col = col + (pic[raw][bitInCol] << bitInCol);	
+			 col = col + (pic[raw][bitInCol] << bitInCol);	
 		}
 		digitalWrite(SS_PIN,LOW);
 		SPI.transfer(0xFF ^ (1<<raw));
@@ -82,6 +94,12 @@ Snake generateHead(Snake head){
 	return head;
 }
 void TheDeath(){
+	int time = 0;
+	while(time != 1050){
+		draw(death);
+		time++;
+	}
+	delay(1);
 	asm volatile("jmp 0x00");
 }
 
@@ -142,6 +160,17 @@ Dirs getDir(Dirs dir){
 	return dir;
 }
 
+boolean pause[8][8]={
+{0,0,0,0,0,0,0,0},
+{0,1,1,0,0,1,1,0},
+{0,1,1,0,0,1,1,0},
+{0,1,1,0,0,1,1,0},
+{0,1,1,0,0,1,1,0},
+{0,1,1,0,0,1,1,0},
+{0,1,1,0,0,1,1,0},
+{0,0,0,0,0,0,0,0}
+};
+
 void setup(){
 	randomSeed(analogRead(A5));
 	SPI.begin();
@@ -166,10 +195,17 @@ void loop(){
 	}
 	draw(pic);
 	if(digitalRead(Z_AXE_PIN)!=0){
-		delay(150);
+		delay(300);
 		while(digitalRead(Z_AXE_PIN)==0){
-			draw(pic);
+			draw(pause);
+			if(blinkTime == 100){
+				delay(100);
+				blinkTime=0;
+			}
+			else{
+				blinkTime++;
+			}
 		}
-		delay(150);
+		delay(1000);
 	}
 }
