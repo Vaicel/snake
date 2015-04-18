@@ -28,7 +28,7 @@ int t = 1;
 Snake head = {0,2,down};
 Snake body[62] = {NULL};
 
-boolean Number6[8][4] = {
+boolean number6[8][4] = {
 {1,1,1,1},
 {1,0,0,0},
 {1,0,0,0},
@@ -38,7 +38,7 @@ boolean Number6[8][4] = {
 {1,0,0,1},
 {1,1,1,1}
 };
-boolean Number5[8][4] = {
+boolean number5[8][4] = {
 {1,1,1,1},
 {1,0,0,0},
 {1,0,0,0},
@@ -78,7 +78,7 @@ boolean number0[8][4] = {
 {1,0,0,1},
 {1,0,0,1},
 {1,0,0,1},
-{1,1,1,1}
+{1,1,011}
 };
 
 boolean number7[8][4] = {
@@ -89,7 +89,7 @@ boolean number7[8][4] = {
 {0,0,0,1},
 {0,0,0,1},
 {0,0,0,1},
-{0,0,0,0}
+{0,0,0,1}
 };
 
 boolean number4[8][4] = {
@@ -136,18 +136,6 @@ boolean number1[8][4] = {
 {0,0,0,1}
 };
 
-
-boolean death[8][8]{
-{1,1,0,0,0,0,1,1},
-{1,0,1,0,0,1,0,1},
-{1,1,0,1,1,0,1,1},
-{1,0,1,0,0,1,0,1},
-{1,0,0,0,0,0,0,1},
-{1,0,1,1,1,1,0,1},
-{1,1,0,0,0,0,1,1},
-{1,1,0,0,0,0,1,1}
-};
-
 //body[0]={0,1,1};
 //body[1]={0,0,1};
 
@@ -169,7 +157,61 @@ void draw(boolean pic[8][8]){
 		delay(MATRIX_REFRESH_TIME_MS);
 	}
 }
+void drawpl(boolean pic[8][4],boolean mode){
+	byte col;
+	if(mode == 0){
+		for(int raw = 0; raw < 8; raw++){
+			col=0;
+			for(int bitInCol = 3; bitInCol >= 0; bitInCol--){
+				 col = col + (pic[raw][bitInCol] << bitInCol);	
+			}
+			digitalWrite(SS_PIN,LOW);
+			SPI.transfer(0xFF ^ (1<<raw));
+			SPI.transfer(col);
+			digitalWrite(SS_PIN,HIGH);
+			delay(MATRIX_REFRESH_TIME_MS);
+		}
+	}
+	else{
+		for(int raw = 0; raw < 8; raw++){
+			col=4;
+			for(int bitInCol = 3; bitInCol >= 0; bitInCol--){
+				 col = col + (pic[raw][bitInCol] << bitInCol+4);	
+			}
+			digitalWrite(SS_PIN,LOW);
+			SPI.transfer(0xFF ^ (1<<raw));
+			SPI.transfer(col);
+			digitalWrite(SS_PIN,HIGH);
+			delay(MATRIX_REFRESH_TIME_MS);
+		}
+	}
+}
 
+void drawRecord(int rec){
+	int tens = rec/10;
+	int units = rec%10;
+	switch(tens){
+		case 1: drawpl(number1,0); break;
+		case 2: drawpl(number2,0); break;
+		case 3: drawpl(number3,0); break;
+		case 4: drawpl(number4,0); break;
+		case 5: drawpl(number5,0); break;
+		case 6: drawpl(number6,0); break;
+		case 0: drawpl(number0,0); break;
+	}
+	switch(units){
+		case 1: drawpl(number1,1); break;
+		case 2: drawpl(number2,1); break;
+		case 3: drawpl(number3,1); break;
+		case 4: drawpl(number4,1); break;
+		case 5: drawpl(number5,1); break;
+		case 6: drawpl(number6,1); break;
+		case 7: drawpl(number7,1); break;
+		case 8: drawpl(number8,1); break;
+		case 9: drawpl(number9,1); break;
+		case 0: drawpl(number0,1); break;
+	}
+}
 
 Snake generateHead(Snake head){
 	head.dir = getDir(head.dir);
@@ -205,7 +247,7 @@ Snake generateHead(Snake head){
 void TheDeath(){
 	int time = 0;
 	while(time != 1050){
-		draw(death);
+		drawRecord(snakeLength-2);
 		time++;
 		if(digitalRead(4)==1){
 			time = 1050;
