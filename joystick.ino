@@ -78,7 +78,7 @@ boolean number0[8][4] = {
 {1,0,0,1},
 {1,0,0,1},
 {1,0,0,1},
-{1,1,011}
+{1,1,1,1}
 };
 
 boolean number7[8][4] = {
@@ -174,9 +174,9 @@ void drawpl(boolean pic[8][4],boolean mode){
 	}
 	else{
 		for(int raw = 0; raw < 8; raw++){
-			col=4;
-			for(int bitInCol = 3; bitInCol >= 0; bitInCol--){
-				 col = col + (pic[raw][bitInCol] << bitInCol+4);	
+			col=0;
+			for(int bitInCol = 7; bitInCol >= 4; bitInCol--){
+				 col = col + (pic[raw][bitInCol-4] << bitInCol);	
 			}
 			digitalWrite(SS_PIN,LOW);
 			SPI.transfer(0xFF ^ (1<<raw));
@@ -190,6 +190,8 @@ void drawpl(boolean pic[8][4],boolean mode){
 void drawRecord(int rec){
 	int tens = rec/10;
 	int units = rec%10;
+	clearMatrix();
+	draw(pic);
 	switch(tens){
 		case 1: drawpl(number1,0); break;
 		case 2: drawpl(number2,0); break;
