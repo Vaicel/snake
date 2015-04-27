@@ -1,5 +1,3 @@
-vg     //Beta v 1.0
-
 #include <SPI.h>
 #include "snake.h"
 
