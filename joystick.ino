@@ -23,9 +23,6 @@ int snakeLength=3;
 int lastDir = 1;
 int coount = 0;
 Point food;
-int i = 3;
-int t = 1;
-
 Snake head = {0,2,down};
 Snake body[62] = {NULL};
 
@@ -240,28 +237,6 @@ void generateFood(){
 	food.y= random(8);
 	if (pic[food.x][food.y] != 0){
 		generateFood();
-	}
-}
-
-void playMusic() {
-	if(t%2 == 0){	
-		noTone(5);
-		tone(5, i*100, 300);
-		i++;
-	}
-	else{
-		noTone(5);
-		tone(5, i*200, 300);
-		i++;
-	}
-	if(i>6){
-		i=3;
-		t++;
-	}
-	
-	if(t>24){
-		noTone(5);
-		t=1;
 	}
 }
 
