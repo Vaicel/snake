@@ -206,7 +206,7 @@ void TheDeath(){
 		drawRecord(snakeLength-2);
 		time++;
 		if(digitalRead(Z_AXE_PIN)==1){
-			time = 1050;
+			break;
 		}
 	}
 	delay(350);
@@ -278,7 +278,6 @@ void loop(){
 			generateFood();
 		}
 		pic[food.y][food.x] = 1;
-		playMusic();
 		timerPrev = timer;
 	}
 	draw(pic);
