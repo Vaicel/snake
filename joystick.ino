@@ -1,4 +1,4 @@
-//Beta v 1.0
+//v 1.1
 
 #include <SPI.h>
 #include "snake.h"
@@ -16,6 +16,10 @@
 int blinkTime = 0;
 
 boolean pic[8][8];
+
+int massiveLenght = 0;
+
+int voidCells[][2];
 
 int timer = 0, timerPrev = 0;
 
@@ -41,6 +45,18 @@ void draw(boolean pic[8][8]){
 		digitalWrite(SS_PIN,HIGH);
 		delay(MATRIX_REFRESH_TIME_MS);
 	}
+}
+
+void voidCell(boolean pic[8][8]){
+         for(int y =0, y<8,y++){
+                   for(int x=0,x<8,x++){
+                             if(pic[y][x] == 0{
+                                       voidCells[massiveLenght][0]=y;
+                                       voidCells[massiveLenght][1]=x;
+                                       massiveLenght++;
+                             }
+                   }
+         }                   
 }
 
 void drawRecord(int rec){
@@ -93,7 +109,7 @@ Snake generateHead(Snake head){
 void TheDeath(){
 	int time = 0;
 	while(time != 1050){
-		drawRecord(snakeLength-2);
+		drawRecord(snakeLength-3);
 		time++;
 		if(digitalRead(Z_AXE_PIN)==1){
 			break;
@@ -119,15 +135,13 @@ void clearMatrix(){
 		for(int y1 = 0; y1 < 8; y1++){	
 			pic[x1][y1]=0;
 		}
-	}
+          }
 }
 
 void generateFood(){
-	food.x= random(8);
-	food.y= random(8);
-	if (pic[food.x][food.y] != 0){
-		generateFood();
-	}
+          int FoodRand = rand(massiveLenght-1);
+          food.y = voidCells[FoodRand][0];
+          food.x = voidCells[FoodRand][1];
 }
 
 Dirs getDir(Dirs dir){
@@ -155,7 +169,8 @@ void setup(){
   	pinMode(SS_PIN, OUTPUT);
   	pinMode(5, OUTPUT);
 	pinMode(Z_AXE_PIN, INPUT_PULLUP);
-	generateFood();
+          voidCell(pic);
+          generateFood();
 }
 void loop(){
 	timer = millis();
@@ -165,7 +180,9 @@ void loop(){
 		head = generateHead(head);
 		if(head.x == food.x && head.y == food.y){
 			snakeLength++;
+                              voidCell(pic);
 			generateFood();
+                              massiveLenght=0;
 		}
 		pic[food.y][food.x] = 1;
 		timerPrev = timer;
