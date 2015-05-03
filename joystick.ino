@@ -171,6 +171,7 @@ void setup(){
 	pinMode(Z_AXE_PIN, INPUT_PULLUP);
           voidCell(pic);
           generateFood();
+          massiveLenght=0;
 }
 void loop(){
 	timer = millis();
