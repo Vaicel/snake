@@ -8,7 +8,7 @@
 
 int blinkTime = 0;
 
-boolean pic[8][8];
+boolean pic[RAWS_NUM][COLS_NUM];
 
 int voidCellsArrayLength = 0;
 int voidCells[CELLS_NUM-3][2];
@@ -24,9 +24,9 @@ Point food;
 Snake head = {0,2,down};
 Snake body[CELLS_NUM-2] = {NULL};
 
-void detectVoidCells(boolean pic[8][8]){
-	for(int y=0; y<8; y++){
-		for(int x=0; x<8; x++){
+void detectVoidCells(boolean pic[RAWS_NUM][COLS_NUM]){
+	for(int y=0; y<RAWS_NUM; y++){
+		for(int x=0; x<COLS_NUM; x++){
 			if(pic[y][x] == 0){
 				voidCells[voidCellsArrayLength][0]=y;
 				voidCells[voidCellsArrayLength][1]=x;
@@ -39,13 +39,13 @@ void detectVoidCells(boolean pic[8][8]){
 void drawRecord(int rec){
 	int tens = rec/10;
 	int units = rec%10;
-	for(int x=0; x<4; x++){
-	    for(int y=0; y<8; y++){
+	for(int x=0; x<COLS_NUM/2; x++){
+	    for(int y=0; y<RAWS_NUM; y++){
 	 		pic[y][x] = numbers[tens][y][x];       
 	    }
 	}
-	for(int x=0; x<4; x++){
-	    for(int y=0; y<8; y++){
+	for(int x=0; x<COLS_NUM/2; x++){
+	    for(int y=0; y< RAWS_NUM; y++){
 	 		pic[y][x+4] = numbers[units][y][x];       
 	    }
 	}
@@ -61,8 +61,8 @@ Snake generateHead(Snake head){
 		case right:		head.x += 1;	break;
 	}
 	lastDir=head.dir;
-	if ((head.x > 7) || (head.x < 0)) head.x = 8 - abs(head.x);
-	if ((head.y > 7) || (head.y < 0)) head.y = 8 - abs(head.y);
+	if ((head.x > COLS_NUM-1) || (head.x < 0)) head.x = COLS_NUM - abs(head.x);
+	if ((head.y > RAWS_NUM-1) || (head.y < 0)) head.y = RAWS_NUM - abs(head.y);
 	if (pic[head.y][head.x] == 1 && head.x != food.x && head.y != food.y) theDeath();
 	pic[head.y][head.x] = 1;
 	return head;
@@ -92,8 +92,8 @@ Snake generateBody(Snake body[CELLS_NUM-2]){
 }
 
 void clearMatrix(){
-	for(int x1 = 0; x1 < 8; x1++){
-		for(int y1 = 0; y1 < 8; y1++){	
+	for(int x1 = 0; x1 < COLS_NUM; x1++){
+		for(int y1 = 0; y1 < RAWS_NUM; y1++){	
 			pic[x1][y1]=0;
 		}
 	}
@@ -115,9 +115,7 @@ Dirs getDir(Dirs dir){
 
 void setup(){
 	randomSeed(analogRead(A5));
-	SPI.begin();
-  	pinMode(SS_PIN, OUTPUT);
-  	pinMode(5, OUTPUT);   // что это?
+          pinMode(SS_PIN, OUTPUT);
 	pinMode(Z_AXE_PIN, INPUT_PULLUP);
 	detectVoidCells(pic);
 	generateFood();
