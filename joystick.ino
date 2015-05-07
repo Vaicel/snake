@@ -115,7 +115,7 @@ Dirs getDir(Dirs dir){
 	return dir;
 }
 
-void pause(){
+void paused(){
 	if(digitalRead(Z_AXE_PIN)!=0){
 		delay(300);
 		while(digitalRead(Z_AXE_PIN)==0){
@@ -158,5 +158,5 @@ void loop(){
 		timerPrev = timer;
 	}
 	draw(pic);
-          pause();
+          paused();
 }
