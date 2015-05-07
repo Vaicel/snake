@@ -47,7 +47,7 @@ struct Flesh{
 };
 
 /*********
-* Класс
+* Классы
 **********/
 
 class Snake
@@ -55,14 +55,26 @@ class Snake
 public:
 	int length;
 	Dirs lastDir;
-	Snake(int sspin);
+	Snake();
 	~Snake();
-	void draw(boolean pic[8][8]);
 	void isDead();
-	void drawRecord(int rec);
-	boolean pic[RAWS_NUM][COLS_NUM];
 	
 };
+
+class Matrix
+{
+public:
+	Matrix(int sspin);
+	~Matrix();
+	static void drawFrame(boolean frame[RAWS_NUM][COLS_NUM]);
+	static void drawRecord(int rec);
+	static void drawPause();
+	void clear();
+	static boolean pic[RAWS_NUM][COLS_NUM];
+	
+
+};
+
 
 /*********
 * Функции
