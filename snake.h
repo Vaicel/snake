@@ -40,16 +40,34 @@ struct Point{
 	int y;
 };
 
-struct Snake{
+struct Flesh{
 	int x;
 	int y;
 	Dirs dir;
 };
 
 /*********
+* Класс
+**********/
+
+class Snake
+{
+public:
+	int length;
+	Dirs lastDir;
+	Snake(int sspin);
+	~Snake();
+	void draw(boolean pic[8][8]);
+	void isDead();
+	void drawRecord(int rec);
+	boolean pic[RAWS_NUM][COLS_NUM];
+	
+};
+
+/*********
 * Функции
 **********/
 
-void draw(boolean pic[8][8]);
+
 
 #endif
