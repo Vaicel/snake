@@ -1,4 +1,6 @@
-//v 1.1
+/******
+*v 1.1*
+******/
 
 #include <SPI.h>
 #include "snake.h"
@@ -113,10 +115,28 @@ Dirs getDir(Dirs dir){
 	return dir;
 }
 
+void pause(){
+	if(digitalRead(Z_AXE_PIN)!=0){
+		delay(300);
+		while(digitalRead(Z_AXE_PIN)==0){
+			draw(pause);
+			if(blinkTime == 100){
+				delay(100);
+				blinkTime=0;
+			}
+			else{
+				blinkTime++;
+			}
+		}
+		delay(1000);
+	}
+}
+
 void setup(){
 	randomSeed(analogRead(A5));
           pinMode(SS_PIN, OUTPUT);
 	pinMode(Z_AXE_PIN, INPUT_PULLUP);
+          SPI.begin();
 	detectVoidCells(pic);
 	generateFood();
 	voidCellsArrayLength=0;
@@ -138,18 +158,5 @@ void loop(){
 		timerPrev = timer;
 	}
 	draw(pic);
-	if(digitalRead(Z_AXE_PIN)!=0){
-		delay(300);
-		while(digitalRead(Z_AXE_PIN)==0){
-			draw(pause);
-			if(blinkTime == 100){
-				delay(100);
-				blinkTime=0;
-			}
-			else{
-				blinkTime++;
-			}
-		}
-		delay(1000);
-	}
+          pause();
 }
