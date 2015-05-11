@@ -116,20 +116,18 @@ Dirs getDir(Dirs dir){
 }
 
 void paused(){
-	if(digitalRead(Z_AXE_PIN)!=0){
-		delay(300);
-		while(digitalRead(Z_AXE_PIN)==0){
-			draw(pause);
-			if(blinkTime == 100){
-				delay(100);
-				blinkTime=0;
-			}
-			else{
-				blinkTime++;
-			}
+	delay(300);
+	while(digitalRead(Z_AXE_PIN)==0){
+		draw(pause);
+		if(blinkTime == 100){
+			delay(100);
+			blinkTime=0;
 		}
-		delay(1000);
+		else{
+			blinkTime++;
+		}
 	}
+	delay(1000);
 }
 
 void setup(){
@@ -157,6 +155,9 @@ void loop(){
 		pic[food.y][food.x] = 1;
 		timerPrev = timer;
 	}
+	
 	draw(pic);
-          paused();
+	if(digitalRead(Z_AXE_PIN)!=0){
+    	paused();
+	}
 }
